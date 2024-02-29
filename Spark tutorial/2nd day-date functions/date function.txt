@@ -1,0 +1,30 @@
+Notebook:
+
+https://databricks-prod-cloudfront.cloud.databricks.com/public/4027ec902e239c93eaaa8714f173bcfc/7247720804594911/644091869343864/311416097720350/latest.html
+
+
+Code:
+
+path="/FileStore/tables/donations.csv"
+df=spark.read.format("csv").option("header","true").option("inferschema","true").load(path)
+df.show()
+
+from pyspark.sql.functions import *
+spark.conf.set("spark.sql.session.timezone","CSI")
+ndf=df.withColumn("today",current_date())
+
+ndf=df.withColumn("today",current_date())\
+.withColumn("ts",current_timestamp())\
+    .withColumn("dtdiff",datediff(col("today"),col("dt")))\
+        .withColumn("lastday",last_day(col("dt")))\
+            .withColumn("dtadd",date_add(col("dt"),100))\
+                .withColumn("dtsub",date_add(col("dt"),-100))\
+                    .withColumn("addmn",add_months(col("dt"),2))\
+                        .withColumn("dayofyear",dayofyear("dt"))\
+                            .withColumn("dayofmonth",dayofmonth("dt"))\
+                                .withColumn("dayofweeek",dayofweek("dt"))\
+                                    .withColumn("monthsbetween",months_between(col("today"),col("dt")))\
+                                        .withColumn("nextday",next_day(col("dt"),"fri")).withColumn("qrt",quarter(col("dt")))\
+                                            .withColumn("dttrunc",date_trunc("year",col("dt")))
+display(ndf)
+

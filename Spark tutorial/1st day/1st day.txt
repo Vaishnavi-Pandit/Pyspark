@@ -1,0 +1,24 @@
+df=spark.read.format("csv").option("header","true").option("sep",";").option("inferschema","true").load("path")
+#all the data is in string format we have to convert it to appropriate format.
+ndf=df.orderBy(col("Balance").desc())
+ndf.show()
+
+#to add the dataset seperated by #!
+data1="path"
+#dropmalformed is for removing the data that is not in right format.
+df=spark.read.format("csv").option("header","true").option("sep","#!").option("inferschema","true").option("mode","DROPMALFORMED").load(data1)
+nfd=df.withcolumn("age",lit(19)).withcolumn("phone2",current_date())
+#withcolumn used only two 1) add new column 2) to update the data in existing column.
+
+display(df)
+
+nfd=df.withcolum(col("state")=="OH","ohio").when(col("state")=="NJ","NewJersey").otherwise(col("state"))).withcolumn(col("phone1"),"-","")
+nfd=df.withcolumn("email",regexp_replace(col("email"),"[@_.]","*"))
+df.withcolumn("substr",substring(col("email"),5,8)).withcolumn("substrind",substring_index(col("substrind").agg(count(*).alias("cnt")).orderBy(col("cnt").desc())'''
+df.withcolumn("spl",split(col("email")."@".-1))
+
+#different dataset
+data="path"
+df=spark.read.format("csv").option("header","true").load(data)
+from pyspark.sql.functions import *
+ndf=df.withcolumn("location",split(col("location"),",").withcolumn("location",explode(col("location")))
