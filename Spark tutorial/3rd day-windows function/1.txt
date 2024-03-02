@@ -1,0 +1,18 @@
+notebook link:https://databricks-prod-cloudfront.cloud.databricks.com/public/4027ec902e239c93eaaa8714f173bcfc/7247720804594911/4159085841651533/311416097720350/latest.html
+code:
+
+df=spark.read.format("csv").option("header","true").option("inferschema","true").load("/FileStore/tables/empmysql1.csv")
+df.show()
+
+df.createOrReplaceTempView("tab")
+res=spark.sql("select *,dense_rank()over(order by sal desc) drank from tab")
+from pyspark.sql.window import *
+from pyspark.sql.functions import *
+win= Window.orderBy(col("sal").desc())
+ndf=df.withColumn("drank",dense_rank().over(win)).withColumn("rnk",rank().over(win)).withColumn("rno",row_number().over(win))
+display(ndf) 
+
+#ntile is used for grading system or distinction type of system 
+#percentage rank is used to give rank between 0 and 1
+ndf1=ndf.withColumn("ntile",ntile(3).over(win)).withColumn("per",percent_rank().over(win))
+display(ndf1)

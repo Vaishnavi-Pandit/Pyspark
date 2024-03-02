@@ -1,0 +1,23 @@
+notebook link: https://databricks-prod-cloudfront.cloud.databricks.com/public/4027ec902e239c93eaaa8714f173bcfc/7247720804594911/4159085841651537/311416097720350/latest.html
+
+data="/FileStore/tables/IBM.csv"
+df=spark.read.format("csv").option("header","true").option("inferSchema","true").load(data)
+#df.show()
+from pyspark.sql.window import *
+from pyspark.sql.functions import *
+from pyspark.sql.types import *
+win=Window.orderBy(col("Date").desc())
+def grade(num):
+    num=float(num or 0)
+    if num>0.01 and num<0.1:
+        return "little bit profit"
+    elif num>0.9:
+        return "high profit"
+    elif num>=0.1 and num<=0.9:
+        return "ok profit"
+    else:
+        return "loss"
+#convert function into spark understandable format.
+gudf=udf(grade)
+ndf=df.withColumn("lead",lead(col("Close")).over(win)).withColumn("diff",col("Close")-col("lead")).withColumn("status",when(col("diff")>col("high"),col("low"))).withColumn("progress",gudf(col("diff")))
+ndf.show()
